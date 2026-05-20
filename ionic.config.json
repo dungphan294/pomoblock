@@ -1,0 +1,7 @@
+{
+  "name": "pomoblock",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
