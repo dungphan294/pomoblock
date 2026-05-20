@@ -32,6 +32,9 @@ jobs:
       - name: Sync Capacitor Android
         run: npx cap sync android
 
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
       - name: Decode Keystore File
         env:
           ENCODED_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -48,7 +51,7 @@ jobs:
 
       - name: Execute Fastlane
         env:
-          KEYSTORE_PATH: "release.keystore"
+          KEYSTORE_PATH: "app/release.keystore"
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
