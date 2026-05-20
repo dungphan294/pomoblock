@@ -49,6 +49,12 @@ jobs:
           # Decode the base64-encoded JSON and save it to the expected location for Fastlane
           mkdir -p android/fastlane && echo "$ENCODED_JSON" | base64 --decode > android/fastlane/play_store_key.json
 
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: false
+
       - name: Execute Fastlane
         env:
           KEYSTORE_PATH: "app/release.keystore"
