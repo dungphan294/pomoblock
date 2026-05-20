@@ -54,4 +54,4 @@ jobs:
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         working-directory: android
         # This triggers the specific 'internal' lane we wrote in your Fastfile
-        run: bundle exec fastlane internal
+        run: fastlane internal
