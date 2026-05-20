@@ -46,13 +46,6 @@ jobs:
           # Decode the base64-encoded JSON and save it to the expected location for Fastlane
           mkdir -p android/fastlane && echo "$ENCODED_JSON" | base64 --decode > android/fastlane/play_store_key.json
 
-      - name: Install Ruby Dependencies
-        working-directory: android
-        run: |
-          # Ensure the cloud server has the required tools for Fastlane
-          gem install bundler
-          bundle install
-
       - name: Execute Fastlane
         env:
           KEYSTORE_PATH: "release.keystore"
