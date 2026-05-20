@@ -36,15 +36,15 @@ jobs:
         env:
           ENCODED_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          # Creates the real keystore file inside the android/app folder
-          echo $ENCODED_KEYSTORE | base64 --decode > android/app/release.keystore
+          # Decode the base64-encoded keystore and save it to the expected location for Fastlane
+          mkdir -p android/app && echo "$ENCODED_KEYSTORE" | base64 --decode > android/app/release.keystore
 
       - name: Decode Google Play JSON
         env:
           ENCODED_JSON: ${{ secrets.PLAY_STORE_JSON_BASE64 }}
         run: |
-          # Creates the real JSON file inside the android/fastlane folder
-          echo $ENCODED_JSON | base64 --decode > android/fastlane/play_store_key.json
+          # Decode the base64-encoded JSON and save it to the expected location for Fastlane
+          mkdir -p android/fastlane && echo "$ENCODED_JSON" | base64 --decode > android/fastlane/play_store_key.json
 
       - name: Install Ruby Dependencies
         working-directory: android
