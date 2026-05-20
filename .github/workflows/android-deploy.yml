@@ -1,0 +1,64 @@
+name: Android Internal Deployment
+
+on:
+  push:
+    branches:
+      - main # Triggers automatically when you push to the main branch
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest # Linux is much cheaper and faster than macOS!
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java (Required for Android)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Install Dependencies & Build Web Assets
+        run: |
+          npm install
+          npm run build
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Decode Keystore File
+        env:
+          ENCODED_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          # Creates the real keystore file inside the android/app folder
+          echo $ENCODED_KEYSTORE | base64 --decode > android/app/release.keystore
+
+      - name: Decode Google Play JSON
+        env:
+          ENCODED_JSON: ${{ secrets.PLAY_STORE_JSON_BASE64 }}
+        run: |
+          # Creates the real JSON file inside the android/fastlane folder
+          echo $ENCODED_JSON | base64 --decode > android/fastlane/play_store_key.json
+
+      - name: Install Ruby Dependencies
+        working-directory: android
+        run: |
+          # Ensure the cloud server has the required tools for Fastlane
+          gem install bundler
+          bundle install
+
+      - name: Execute Fastlane
+        env:
+          KEYSTORE_PATH: "release.keystore"
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        working-directory: android
+        # This triggers the specific 'internal' lane we wrote in your Fastfile
+        run: bundle exec fastlane internal
