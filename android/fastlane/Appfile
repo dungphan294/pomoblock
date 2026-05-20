@@ -1,0 +1,2 @@
+json_key_file("play_store_key.json")
+package_name("com.pomoblock.app")
