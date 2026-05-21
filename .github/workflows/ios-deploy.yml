@@ -62,6 +62,9 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: false
 
+      - name: Select Xcode 26
+        run: sudo xcode-select -s /Applications/Xcode_26.app
+
       - name: Install Fastlane
         run: gem install fastlane
 
