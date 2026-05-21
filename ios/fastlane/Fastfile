@@ -14,7 +14,7 @@ platform :ios do
       team_id: "42UDXF695V",
       bundle_identifier: "com.pomoblock.app",
       profile_name: ENV["IOS_PROVISIONING_PROFILE_NAME"],
-      code_sign_identity: "iPhone Distribution"
+      code_sign_identity: "Apple Distribution"
     )
     build_ios_app(
       project: "App/App.xcodeproj",

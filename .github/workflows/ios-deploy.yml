@@ -70,3 +70,10 @@ jobs:
           IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
         working-directory: ios
         run: fastlane beta
+
+      - name: Upload Build Log on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gym-build-log
+          path: ~/Library/Logs/gym/
