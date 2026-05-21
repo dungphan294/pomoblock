@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(Get-ChildItem -Path \"c:\\\\git\\\\pomoblock\\\\ios\" -Recurse -Force)",
-      "Bash(Select-Object -Property FullName)",
-      "Bash(ConvertTo-Json)"
-    ]
-  }
-}
