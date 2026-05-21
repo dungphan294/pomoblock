@@ -8,6 +8,14 @@ platform :ios do
       issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
       key_filepath: "fastlane/app_store_connect_api_key.p8"
     )
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "App/App.xcodeproj",
+      team_id: "42UDXF695V",
+      bundle_identifier: "com.pomoblock.app",
+      profile_name: ENV["IOS_PROVISIONING_PROFILE_NAME"],
+      code_sign_identity: "iPhone Distribution"
+    )
     build_ios_app(
       project: "App/App.xcodeproj",
       scheme: "App",
