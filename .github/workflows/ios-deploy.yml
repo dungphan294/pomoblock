@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build_and_deploy:
@@ -20,7 +21,7 @@ jobs:
 
       - name: Install Dependencies & Build Web Assets
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Sync Capacitor iOS
@@ -60,7 +61,8 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
-          bundler-cache: false
+          bundler-cache: true
+          working-directory: ios
 
       - name: Select Latest Xcode
         run: |
@@ -70,15 +72,12 @@ jobs:
           sudo xcode-select -s "$LATEST_XCODE"
           xcodebuild -version
 
-      - name: Install Fastlane
-        run: gem install fastlane
-
       - name: Execute Fastlane
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         working-directory: ios
-        run: fastlane beta
+        run: bundle exec fastlane beta
 
       - name: Upload Build Log on Failure
         if: failure()
