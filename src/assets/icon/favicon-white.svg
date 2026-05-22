@@ -1,0 +1,11 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="micro-tracker-knockout">
+      <rect width="64" height="64" fill="white" />
+      <circle cx="32" cy="32" r="20" fill="none" stroke="black" stroke-width="4" />
+      <circle cx="32" cy="32" r="20" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-dasharray="125" stroke-dashoffset="73" transform="rotate(-90 32 32)" />
+    </mask>
+  </defs>
+  
+  <circle cx="32" cy="32" r="28" fill="#FFFFFF" mask="url(#micro-tracker-knockout)" />
+</svg>

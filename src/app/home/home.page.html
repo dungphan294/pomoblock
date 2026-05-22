@@ -1,20 +1,70 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="home-wrap">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <!-- Session indicator -->
+    <div class="session-row">
+      <span class="session-label">SESSION {{ sessionInRound + 1 }} OF {{ longBreakAfter }}</span>
+      <div class="session-dots">
+        @for (active of sessionDots; track $index) {
+          <span class="dot" [class.active]="active"></span>
+        }
+      </div>
+    </div>
+
+    <!-- Ring timer -->
+    <div class="ring-container">
+      <svg viewBox="0 0 220 220" fill="none" class="ring-svg">
+        <!-- Tick marks -->
+        <g class="ticks">
+          <line x1="110" y1="8" x2="110" y2="18" class="tick"/>
+          <line x1="212" y1="110" x2="202" y2="110" class="tick"/>
+          <line x1="110" y1="212" x2="110" y2="202" class="tick"/>
+          <line x1="8" y1="110" x2="18" y2="110" class="tick"/>
+        </g>
+        <!-- Track ring -->
+        <circle cx="110" cy="110" r="94" class="ring-track"/>
+        <!-- Progress ring -->
+        <circle cx="110" cy="110" r="94" class="ring-progress"
+                [attr.stroke-dashoffset]="ringOffset"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-mode-tag">{{ modeLabel }}</div>
+        <div class="timer-digits">{{ minutes }}<span class="colon">:</span>{{ seconds }}</div>
+        <div class="timer-sub">{{ timerSubLabel }}</div>
+      </div>
+    </div>
+
+    <!-- Start / Pause button -->
+    <button type="button" class="start-btn" (click)="toggleTimer()">
+      <span class="btn-label">{{ btnLabel }}</span>
+      <span class="btn-indicator"></span>
+    </button>
+
+    <!-- Reset (shown only when session is active or mid-session) -->
+    @if (showReset) {
+      <button type="button" class="reset-btn" (click)="reset()">Reset</button>
+    }
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-value">{{ workDurationMin }}</span>
+        <span class="stat-unit">MIN</span>
+        <span class="stat-label">WORK</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">{{ shortBreakMin }}</span>
+        <span class="stat-unit">MIN</span>
+        <span class="stat-label">BREAK</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">{{ completedToday }}</span>
+        <span class="stat-unit"></span>
+        <span class="stat-label">DONE TODAY</span>
+      </div>
+    </div>
+
   </div>
 </ion-content>

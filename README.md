@@ -35,6 +35,7 @@ Go to **GitHub → Settings → Secrets and variables → Actions** to add these
 
 | Secret | Description | How to get it |
 |---|---|---|
+| `GOOGLE_SERVICE_INFO_PLIST_BASE64` | Firebase config for iOS, base64-encoded | **Firebase Console → Project settings → iOS app** → download `GoogleService-Info.plist` → `base64 -i GoogleService-Info.plist \| pbcopy` |
 | `IOS_CERTIFICATE_BASE64` | Apple Distribution .p12 certificate, base64-encoded | Export from **Keychain Access** → select your Apple Distribution cert → Export as .p12 → `base64 -i cert.p12 \| pbcopy` |
 | `IOS_CERTIFICATE_PASSWORD` | Password set when exporting the .p12 | You choose this when exporting |
 | `IOS_PROVISIONING_PROFILE_BASE64` | Distribution provisioning profile, base64-encoded | Download `.mobileprovision` from [Apple Developer portal](https://developer.apple.com/account/resources/profiles/list) → `base64 -i profile.mobileprovision \| pbcopy` |
@@ -46,6 +47,7 @@ Go to **GitHub → Settings → Secrets and variables → Actions** to add these
 
 | Secret | Description | How to get it |
 |---|---|---|
+| `GOOGLE_SERVICES_JSON_BASE64` | Firebase config for Android, base64-encoded | **Firebase Console → Project settings → Android app** → download `google-services.json` → `base64 -i google-services.json \| pbcopy` |
 | `ANDROID_KEYSTORE_BASE64` | Release keystore, base64-encoded | Generate with `keytool` (see below) → `base64 -i release.keystore \| pbcopy` |
 | `ANDROID_KEYSTORE_PASSWORD` | Keystore password | Set when running `keytool -genkey` |
 | `ANDROID_KEY_ALIAS` | Key alias inside the keystore | Set when running `keytool -genkey` |

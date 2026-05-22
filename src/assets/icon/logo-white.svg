@@ -1,0 +1,16 @@
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="scaled-tracker-knockout">
+      <rect width="1024" height="1024" fill="white" />
+      <circle cx="512" cy="512" r="320" fill="none" stroke="black" stroke-width="64" />
+      <circle cx="512" cy="512" r="320" fill="none" stroke="white" stroke-width="64" stroke-linecap="round" stroke-dasharray="2010" stroke-dashoffset="1173" transform="rotate(-90 512 512)" />
+    </mask>
+  </defs>
+
+  <g transform="translate(20, 20) scale(0.15)">
+    <circle cx="512" cy="512" r="448" fill="#FFFFFF" mask="url(#scaled-tracker-knockout)" />
+  </g>
+  
+  <text x="210" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="700" fill="#FFFFFF">PomoBlock</text>
+  
+  </svg>

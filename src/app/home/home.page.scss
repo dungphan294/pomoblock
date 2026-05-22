@@ -1,27 +1,286 @@
-#container {
-  text-align: center;
+// ─── Ring constants ───────────────────────────────────────────────────────
+// r=94 → circumference = 2π × 94 ≈ 590.6
+$ring-c: 590.6;
 
+// ─── Layout ───────────────────────────────────────────────────────────────
+.home-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 8px 28px 16px;
+  background: var(--pomo-bg);
+}
+
+// ─── Session row ──────────────────────────────────────────────────────────
+.session-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.session-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--pomo-text-muted);
+  text-transform: uppercase;
+}
+
+.session-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: var(--pomo-border);
+    transition: background 0.3s ease;
+
+    &.active {
+      background: var(--pomo-red);
+      box-shadow: 0 0 5px var(--pomo-red-glow);
+    }
+  }
+}
+
+// ─── Ring timer ───────────────────────────────────────────────────────────
+.ring-container {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  flex-shrink: 0;
+}
+
+.ring-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ticks {
+  .tick {
+    stroke: var(--pomo-border);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+}
+
+.ring-track {
+  stroke: var(--pomo-surface-2);
+  stroke-width: 3;
+  fill: none;
+}
+
+.ring-progress {
+  stroke: var(--pomo-red);
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: #{$ring-c};
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  animation: ring-glow 2.8s ease-in-out infinite;
+}
+
+.ring-tip {
+  fill: var(--pomo-red);
+  filter: drop-shadow(0 0 4px var(--pomo-red));
+}
+
+@keyframes ring-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(229, 57, 53, 0.5))
+            drop-shadow(0 0 12px rgba(229, 57, 53, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(229, 57, 53, 0.75))
+            drop-shadow(0 0 22px rgba(229, 57, 53, 0.38));
+  }
+}
+
+.timer-center {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.timer-mode-tag {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  color: var(--pomo-red);
+  text-transform: uppercase;
+  border: 1px solid var(--pomo-red-glow);
+  border-radius: 2px;
+  padding: 2px 8px;
+  background: var(--pomo-red-subtle);
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.timer-digits {
+  font-family: var(--font-display);
+  font-size: 58px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--pomo-text);
+  line-height: 1;
+  letter-spacing: -0.02em;
 
-  color: #8c8c8c;
-
-  margin: 0;
+  .colon {
+    opacity: 0.6;
+    animation: blink-colon 1s step-start infinite;
+  }
 }
 
-#container a {
-  text-decoration: none;
+@keyframes blink-colon {
+  0%, 49% { opacity: 0.6; }
+  50%, 100% { opacity: 0.15; }
+}
+
+.timer-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--pomo-text-dim);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+// ─── Start button ─────────────────────────────────────────────────────────
+.start-btn {
+  width: 100%;
+  max-width: 280px;
+  height: 52px;
+  background: var(--pomo-red);
+  border: none;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 28px rgba(229, 57, 53, 0.28),
+              0 4px 14px rgba(229, 57, 53, 0.36);
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 16px rgba(229, 57, 53, 0.2),
+                0 2px 8px rgba(229, 57, 53, 0.3);
+  }
+}
+
+.btn-label {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.btn-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  animation: btn-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes btn-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+// ─── Reset button ─────────────────────────────────────────────────────────
+.reset-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pomo-text-dim);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+// ─── Stats row ────────────────────────────────────────────────────────────
+.stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  max-width: 280px;
+  background: var(--pomo-surface);
+  border: 1px solid var(--pomo-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  gap: 1px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--pomo-text);
+  line-height: 1;
+}
+
+.stat-unit {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--pomo-text-muted);
+  letter-spacing: 0.08em;
+  height: 12px;
+  line-height: 12px;
+}
+
+.stat-label {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--pomo-text-dim);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 48px;
+  background: var(--pomo-border);
+  flex-shrink: 0;
 }

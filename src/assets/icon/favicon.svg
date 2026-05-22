@@ -1,0 +1,7 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- <rect width="64" height="64" fill="#F8F9FA" /> -->
+  <circle cx="32" cy="32" r="28" fill="#FF0F01" />
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.4" />
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-dasharray="125" stroke-dashoffset="73" transform="rotate(-90 32 32)" />
+  <circle cx="32" cy="32" r="8" fill="#FF0F01" />
+</svg>

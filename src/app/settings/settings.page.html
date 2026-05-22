@@ -1,0 +1,164 @@
+<ion-content [fullscreen]="true">
+  <div class="settings-wrap">
+
+    <!-- Focus durations -->
+    <ion-list>
+      <ion-list-header>Focus</ion-list-header>
+
+      <ion-item lines="full">
+        <ion-label>Work Duration</ion-label>
+        <ion-select slot="end" class="duration-select"
+                    interface="action-sheet"
+                    [value]="settings.workDuration"
+                    (ionChange)="save('workDuration', $event.detail.value)">
+          <ion-select-option [value]="5">5 min</ion-select-option>
+          <ion-select-option [value]="10">10 min</ion-select-option>
+          <ion-select-option [value]="15">15 min</ion-select-option>
+          <ion-select-option [value]="20">20 min</ion-select-option>
+          <ion-select-option [value]="25">25 min</ion-select-option>
+          <ion-select-option [value]="30">30 min</ion-select-option>
+          <ion-select-option [value]="45">45 min</ion-select-option>
+          <ion-select-option [value]="60">60 min</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label>Auto-start Next Session</ion-label>
+        <ion-toggle slot="end" color="primary"
+                    [checked]="settings.autoStartNextSession"
+                    (ionChange)="save('autoStartNextSession', $event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+    </ion-list>
+
+    <!-- Break settings -->
+    <ion-list>
+      <ion-list-header>Breaks</ion-list-header>
+
+      <ion-item lines="full">
+        <ion-label>Short Break</ion-label>
+        <ion-select slot="end" class="duration-select"
+                    interface="action-sheet"
+                    [value]="settings.shortBreakDuration"
+                    (ionChange)="save('shortBreakDuration', $event.detail.value)">
+          <ion-select-option [value]="1">1 min</ion-select-option>
+          <ion-select-option [value]="2">2 min</ion-select-option>
+          <ion-select-option [value]="3">3 min</ion-select-option>
+          <ion-select-option [value]="5">5 min</ion-select-option>
+          <ion-select-option [value]="10">10 min</ion-select-option>
+          <ion-select-option [value]="15">15 min</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label>Long Break</ion-label>
+        <ion-select slot="end" class="duration-select"
+                    interface="action-sheet"
+                    [value]="settings.longBreakDuration"
+                    (ionChange)="save('longBreakDuration', $event.detail.value)">
+          <ion-select-option [value]="5">5 min</ion-select-option>
+          <ion-select-option [value]="10">10 min</ion-select-option>
+          <ion-select-option [value]="15">15 min</ion-select-option>
+          <ion-select-option [value]="20">20 min</ion-select-option>
+          <ion-select-option [value]="25">25 min</ion-select-option>
+          <ion-select-option [value]="30">30 min</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label>Long Break After</ion-label>
+        <ion-select slot="end" class="duration-select"
+                    interface="action-sheet"
+                    [value]="settings.longBreakAfter"
+                    (ionChange)="save('longBreakAfter', $event.detail.value)">
+          <ion-select-option [value]="2">2 sessions</ion-select-option>
+          <ion-select-option [value]="3">3 sessions</ion-select-option>
+          <ion-select-option [value]="4">4 sessions</ion-select-option>
+          <ion-select-option [value]="5">5 sessions</ion-select-option>
+          <ion-select-option [value]="6">6 sessions</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label>Auto-start Breaks</ion-label>
+        <ion-toggle slot="end" color="primary"
+                    [checked]="settings.autoStartBreaks"
+                    (ionChange)="save('autoStartBreaks', $event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+    </ion-list>
+
+    <!-- Blocking settings -->
+    <ion-list>
+      <ion-list-header>Blocking</ion-list-header>
+
+      <ion-item lines="full">
+        <ion-label>Enable Blocking</ion-label>
+        <ion-toggle slot="end" color="primary"
+                    [checked]="settings.enableBlocking"
+                    (ionChange)="save('enableBlocking', $event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label>Strict Mode</ion-label>
+        <ion-label class="setting-sub" slot="end">Can't disable mid-session</ion-label>
+        <ion-toggle slot="end" color="primary"
+                    [checked]="settings.strictMode"
+                    (ionChange)="save('strictMode', $event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+    </ion-list>
+
+    <!-- Sound settings -->
+    <ion-list>
+      <ion-list-header>Sound</ion-list-header>
+
+      <ion-item lines="full">
+        <ion-label>Session End Alert</ion-label>
+        <ion-toggle slot="end" color="primary"
+                    [checked]="settings.sessionEndAlert"
+                    (ionChange)="save('sessionEndAlert', $event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item lines="full" [disabled]="!settings.sessionEndAlert">
+        <ion-label>Alert Sound</ion-label>
+        <ion-select slot="end" class="duration-select"
+                    interface="action-sheet"
+                    [value]="settings.sessionEndSoundType"
+                    (ionChange)="save('sessionEndSoundType', $event.detail.value)">
+          <ion-select-option value="beep">Beep</ion-select-option>
+          <ion-select-option value="bell">Bell</ion-select-option>
+          <ion-select-option value="chime">Chime</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item lines="full">
+        <ion-label>Ticking Sound</ion-label>
+        <ion-toggle slot="end" color="primary"
+                    [checked]="settings.tickingSound"
+                    (ionChange)="save('tickingSound', $event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item lines="none" [disabled]="!settings.tickingSound">
+        <ion-label>Tick Sound</ion-label>
+        <ion-select slot="end" class="duration-select"
+                    interface="action-sheet"
+                    [value]="settings.tickingSoundType"
+                    (ionChange)="save('tickingSoundType', $event.detail.value)">
+          <ion-select-option value="tick">Tick</ion-select-option>
+          <ion-select-option value="click">Click</ion-select-option>
+          <ion-select-option value="soft">Soft</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+
+    <!-- App info -->
+    <div class="app-info">
+      <span class="app-info-line">POMOBLOCK · v1.0.0</span>
+    </div>
+
+  </div>
+</ion-content>

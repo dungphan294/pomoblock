@@ -25,13 +25,111 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+// ─── Shared toolbar logo (all pages) ─────────────────────────────────────
+// ion-title shadow DOM clips content with overflow:hidden — override so the
+// SVG icon is never cut off.
+.logo-title::part(native) {
+  overflow: visible;
+}
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+.toolbar-logo-link {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.toolbar-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+// Base type + reset
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+ion-app,
+ion-content,
+ion-page {
+  --background: var(--pomo-bg);
+}
+
+ion-toolbar {
+  --background: var(--pomo-bg);
+  --border-width: 0;
+  font-family: var(--font-ui);
+}
+
+ion-title {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--pomo-text-muted);
+}
+
+// Tab bar
+ion-tab-bar {
+  --background: var(--pomo-surface);
+  border-top: 1px solid var(--pomo-border);
+  height: 64px;
+}
+
+ion-tab-button {
+  --color: var(--pomo-text-muted);
+  --color-selected: var(--pomo-red);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+ion-tab-button ion-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+// Item / list
+ion-item {
+  --background: var(--pomo-surface);
+  --border-color: var(--pomo-border);
+  --color: var(--pomo-text);
+  font-family: var(--font-ui);
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-list-header {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pomo-text-muted);
+  --background: transparent;
+  padding-top: 24px;
+  padding-bottom: 4px;
+}
+
+ion-note {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--pomo-red);
+}
+
+ion-toggle {
+  --track-background: var(--pomo-surface-2);
+  --track-background-checked: var(--pomo-red);
+  --handle-background: var(--pomo-text-muted);
+  --handle-background-checked: #ffffff;
+  --border-radius: 2px;
+  --handle-border-radius: 2px;
+}

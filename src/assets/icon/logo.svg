@@ -1,0 +1,11 @@
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(20, 20) scale(0.15)">
+    <rect width="1024" height="1024" rx="256" fill="#F8F9FA" />
+    <circle cx="512" cy="512" r="390" fill="#FF0F01" />
+    <circle cx="512" cy="512" r="280" fill="none" stroke="#FFFFFF" stroke-width="56" opacity="0.4" />
+    <circle cx="512" cy="512" r="280" fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round" stroke-dasharray="1760" stroke-dashoffset="1028" transform="rotate(-90 512 512)" />
+    <circle cx="512" cy="512" r="112" fill="#FF0F01" />
+  </g>
+  
+  <text x="210" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="700" fill="#FF0F01">PomoBlock</text>
+</svg>

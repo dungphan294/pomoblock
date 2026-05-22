@@ -1,2 +1,60 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// PomoBlock — Light theme using Apple semantic colours
+
+:root {
+  // ─── Custom design tokens ───────────────────────────────────────────────
+  --pomo-bg:           #FFFFFF;
+  --pomo-surface:      #F2F2F7;  // Apple systemGroupedBackground
+  --pomo-surface-2:    #E5E5EA;  // Apple systemGray5
+  --pomo-border:       #C6C6C8;  // Apple separator
+  --pomo-red:          #E53935;
+  --pomo-red-glow:     rgba(229, 57, 53, 0.12);
+  --pomo-red-subtle:   rgba(229, 57, 53, 0.06);
+  --pomo-ember:        #FF7043;
+  --pomo-green:        #26C26A;
+  --pomo-text:         #1C1C1E;  // Apple label
+  --pomo-text-muted:   #8E8E93;  // Apple secondaryLabel
+  --pomo-text-dim:     #AEAEB2;  // Apple tertiaryLabel
+
+  // SF Pro Display activates automatically at large sizes (≥20pt) via -apple-system
+  --font-display: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-ui:      -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  // SF Mono on Apple; Menlo/Monaco as fallbacks
+  --font-mono:    'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+
+  // ─── Ionic overrides ────────────────────────────────────────────────────
+  --ion-background-color:      #FFFFFF;
+  --ion-background-color-rgb:  255, 255, 255;
+
+  --ion-text-color:            #1C1C1E;
+  --ion-text-color-rgb:        28, 28, 30;
+
+  --ion-toolbar-background:    #FFFFFF;
+  --ion-toolbar-color:         #1C1C1E;
+  --ion-toolbar-border-color:  transparent;
+
+  --ion-tab-bar-background:    #F2F2F7;
+  --ion-tab-bar-border-color:  #C6C6C8;
+  --ion-tab-bar-color:         #8E8E93;
+  --ion-tab-bar-color-selected: #E53935;
+
+  --ion-item-background:       #F2F2F7;
+  --ion-item-border-color:     #C6C6C8;
+  --ion-item-color:            #1C1C1E;
+
+  --ion-border-color:          #C6C6C8;
+  --ion-card-background:       #F2F2F7;
+
+  // Primary = crimson red (unchanged)
+  --ion-color-primary:          #E53935;
+  --ion-color-primary-rgb:      229, 57, 53;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-shade:    #ca3230;
+  --ion-color-primary-tint:     #e84d4a;
+
+  // Medium — Apple secondaryLabel tones
+  --ion-color-medium:           #8E8E93;
+  --ion-color-medium-rgb:       142, 142, 147;
+  --ion-color-medium-contrast:  #ffffff;
+  --ion-color-medium-shade:     #7d7d81;
+  --ion-color-medium-tint:      #9a9a9e;
+}
