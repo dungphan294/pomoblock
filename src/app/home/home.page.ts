@@ -1,6 +1,12 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
 import { SessionEndSoundType, SettingsService, TickingSoundType } from '../services/settings.service';
+import {
+  ActionPerformed,
+  PushNotificationSchema,
+  PushNotifications,
+  Token,
+} from '@capacitor/push-notifications';
 
 const RING_C = 590.6;
 
@@ -10,7 +16,7 @@ const RING_C = 590.6;
   styleUrls: ['home.page.scss'],
   imports: [IonContent],
 })
-export class HomePage implements OnDestroy {
+export class HomePage implements OnInit, OnDestroy {
   mode: 'focus' | 'break' = 'focus';
   isRunning = false;
   remainingSeconds: number;
@@ -25,6 +31,50 @@ export class HomePage implements OnDestroy {
     const s = settingsService.get();
     this.totalSeconds = s.workDuration * 60;
     this.remainingSeconds = this.totalSeconds;
+  }
+
+  ngOnInit() {
+    console.log('Initializing HomePage');
+
+    // Request permission to use push notifications
+    // iOS will prompt user and return if they granted permission or not
+    // Android will just grant without prompting
+    PushNotifications.requestPermissions().then(result => {
+      if (result.receive === 'granted') {
+        // Register with Apple / Google to receive push via APNS/FCM
+        PushNotifications.register();
+      } else {
+        // Show some error
+      }
+    });
+
+    // On success, we should be able to receive notifications
+    PushNotifications.addListener('registration',
+      (token: Token) => {
+        alert('Push registration success, token: ' + token.value);
+      }
+    );
+
+    // Some issue with our setup and push will not work
+    PushNotifications.addListener('registrationError',
+      (error: any) => {
+        alert('Error on registration: ' + JSON.stringify(error));
+      }
+    );
+
+    // Show us the notification payload if the app is open on our device
+    PushNotifications.addListener('pushNotificationReceived',
+      (notification: PushNotificationSchema) => {
+        alert('Push received: ' + JSON.stringify(notification));
+      }
+    );
+
+    // Method called when tapping on a notification
+    PushNotifications.addListener('pushNotificationActionPerformed',
+      (notification: ActionPerformed) => {
+        alert('Push action performed: ' + JSON.stringify(notification));
+      }
+    );
   }
 
   ionViewWillEnter(): void {
