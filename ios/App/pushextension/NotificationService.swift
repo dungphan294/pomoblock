@@ -6,11 +6,13 @@ class NotificationService: UNNotificationServiceExtension {
     var bestAttemptContent: UNMutableNotificationContent?
 
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
-        guard let content = request.content.mutableCopy() as? UNMutableNotificationContent else { return }
         self.contentHandler = contentHandler
-        self.bestAttemptContent = content
+        bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
-        FIRMessagingExtensionHelper().populateNotificationContent(content, withContentHandler: contentHandler)
+        if let bestAttemptContent = bestAttemptContent {
+            // Let Firebase populate the notification content with media attachments
+            FIRMessagingExtensionHelper().populateNotificationContent(bestAttemptContent, withContentHandler: contentHandler)
+        }
     }
     
     override func serviceExtensionTimeWillExpire() {
