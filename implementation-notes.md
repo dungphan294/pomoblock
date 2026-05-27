@@ -212,7 +212,7 @@ With the correct bundle ID restored, Xcode could no longer sign the extension us
 
 **Fix**: use `build_ios_app(export_options: { provisioningProfiles: { ... } })` to map each bundle ID to its profile UUID at export time. A second GitHub secret (`IOS_PUSH_EXTENSION_PROFILE_BASE64`) holds the extension's Distribution profile, imported in a new CI step.
 
-**Why `export_options` over a second `update_code_signing_settings` call**: `export_options` is applied at the `xcodebuild -exportArchive` stage without modifying the `.xcodeproj` on disk. It also scales naturally — each additional extension is one more hash entry, one more secret, one more import step. See the "Adding a new iOS app extension" section in `README.md` for the repeatable pattern.
+**Why both `update_code_signing_settings` AND `export_options`**: `xcodebuild archive` and `xcodebuild -exportArchive` are separate steps. `export_options.provisioningProfiles` only applies at export time. The archive step runs first — if the extension target has `CODE_SIGN_STYLE = Automatic` at that point, Xcode fails because it can't reach Apple's developer portal from CI. A second `update_code_signing_settings` call (targeting `["pushextension"]`) switches the extension to manual signing before the archive step runs. `export_options.provisioningProfiles` then explicitly maps both bundle IDs at export time as a belt-and-suspenders measure. For each future extension: add a `update_code_signing_settings` block + an entry in `provisioningProfiles`. See the "Adding a new iOS app extension" section in `README.md`.
 
 ---
 

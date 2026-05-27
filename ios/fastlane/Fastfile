@@ -17,6 +17,15 @@ platform :ios do
       profile_uuid: ENV["PROFILE_UUID"],
       code_sign_identity: "Apple Distribution"
     )
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "App/App.xcodeproj",
+      targets: ["pushextension"],
+      team_id: "42UDXF695V",
+      bundle_identifier: "com.pomoblock.app.pushextension",
+      profile_uuid: ENV["EXTENSION_PROFILE_UUID"],
+      code_sign_identity: "Apple Distribution"
+    )
     build_ios_app(
       project: "App/App.xcodeproj",
       scheme: "App",
