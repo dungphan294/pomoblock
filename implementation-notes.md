@@ -195,3 +195,33 @@ Without AVAudioSession configuration, Capacitor's WKWebView defaults to the `.so
 **Fix**: `AppDelegate.swift` now sets `.playback` + `.mixWithOthers` on launch. `.mixWithOthers` prevents the app from interrupting background music — important since users often listen to music during a Pomodoro session.
 
 **Why not `UIBackgroundModes`**: the timer runs in the foreground only. Background audio would require keeping the JS `setInterval` alive while backgrounded, which WKWebView does not do. That is a separate problem (background timer) not addressed here.
+
+---
+
+## iOS CI/CD: bundle ID collision and provisioning profile architecture
+
+### Bug 1: `update_code_signing_settings` overwrote the extension's bundle ID
+
+`update_code_signing_settings` without a `targets` filter applies to every target in the `.xcodeproj`. Setting `bundle_identifier: "com.pomoblock.app"` overwrote the pushextension target's bundle ID (correctly set to `com.pomoblock.app.pushextension` in `project.pbxproj`) — causing altool to reject the IPA with a 409 `CFBundleIdentifier Collision`.
+
+**Fix**: added `targets: ["App"]` to restrict the call to the main app target only.
+
+### Bug 2: extension had no provisioning profile in CI
+
+With the correct bundle ID restored, Xcode could no longer sign the extension using the main app's profile. Headless CI runners have no Apple ID session — automatic signing cannot reach Apple's developer portal. Every target in the IPA needs an explicit provisioning profile physically present on the runner.
+
+**Fix**: use `build_ios_app(export_options: { provisioningProfiles: { ... } })` to map each bundle ID to its profile UUID at export time. A second GitHub secret (`IOS_PUSH_EXTENSION_PROFILE_BASE64`) holds the extension's Distribution profile, imported in a new CI step.
+
+**Why `export_options` over a second `update_code_signing_settings` call**: `export_options` is applied at the `xcodebuild -exportArchive` stage without modifying the `.xcodeproj` on disk. It also scales naturally — each additional extension is one more hash entry, one more secret, one more import step. See the "Adding a new iOS app extension" section in `README.md` for the repeatable pattern.
+
+---
+
+## CI: per-platform deploy keywords
+
+### Decision: `if:` conditions on jobs rather than workflow-level trigger filters
+
+GitHub Actions cannot suppress a workflow run based on commit message content at the trigger level — the workflow always fires when the push branch matches. The `if:` condition on the job marks it "skipped" (completes in seconds, no billable minutes). Both workflows appear in the Actions tab on every push; one or both are skipped based on keywords.
+
+Keywords: `[deploy]` = both platforms, `[deploy:ios]` = iOS only, `[deploy:android]` = Android only.
+
+**Tradeoff considered**: merging both workflows into a single `deploy.yml` with two jobs would reduce two workflow runs to one. Rejected as a risky structural change with no functional benefit — keeping the files separate maintains clearer ownership and per-platform failure isolation.
