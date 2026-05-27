@@ -8,22 +8,34 @@ Ionic/Capacitor app with automated CI/CD via GitHub Actions + Fastlane for both 
 
 | Platform | Runner | Trigger | Destination |
 |---|---|---|---|
-| iOS | `macos-latest` | Push to `main` or manual | TestFlight |
-| Android | `ubuntu-latest` | Push to `main` or manual | Play Store internal |
+| iOS | `macos-latest` | `[deploy]` or `[deploy:ios]` in commit message, or manual | TestFlight |
+| Android | `ubuntu-latest` | `[deploy]` or `[deploy:android]` in commit message, or manual | Play Store internal |
 
 Both pipelines use [Fastlane](https://fastlane.tools/) for building and uploading.
 
 ---
 
-## Skipping CI on a push
+## Deploying from a commit
 
-Add `[skip ci]` anywhere in your commit message to prevent both workflows from running:
+Deployments are opt-in. Add a keyword anywhere in your commit message to trigger the relevant pipeline(s):
+
+| Keyword | iOS | Android |
+|---|---|---|
+| `[deploy]` | ✅ | ✅ |
+| `[deploy:ios]` | ✅ | ❌ |
+| `[deploy:android]` | ❌ | ✅ |
+| *(no keyword)* | ❌ | ❌ |
+
+Examples:
 
 ```bash
-git commit -m "update config [skip ci]"
+git commit -m "chore: bump version [deploy]"              # both platforms
+git commit -m "fix: iOS push crash [deploy:ios]"          # iOS only
+git commit -m "fix: Android back button [deploy:android]" # Android only
+git commit -m "docs: update README"                       # no deploy
 ```
 
-To trigger a workflow manually without pushing, go to **GitHub → Actions → select workflow → Run workflow**.
+To trigger manually without a push, go to **GitHub → Actions → select workflow → Run workflow**.
 
 ---
 

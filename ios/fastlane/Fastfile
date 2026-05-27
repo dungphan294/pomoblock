@@ -11,6 +11,7 @@ platform :ios do
     update_code_signing_settings(
       use_automatic_signing: false,
       path: "App/App.xcodeproj",
+      targets: ["App"],
       team_id: "42UDXF695V",
       bundle_identifier: "com.pomoblock.app",
       profile_uuid: ENV["PROFILE_UUID"],
