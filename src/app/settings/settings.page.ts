@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   IonContent,
   IonList,
@@ -11,7 +11,7 @@ import {
 } from '@ionic/angular/standalone';
 import { AppSettings, SettingsService } from '../services/settings.service';
 import { Capacitor } from '@capacitor/core';
-import { App } from '@capacitor/app';
+import { EnvironmentService } from '../services/environment.service';
 
 @Component({
   standalone: true,
@@ -29,18 +29,15 @@ import { App } from '@capacitor/app';
     IonSelectOption,
   ],
 })
-export class SettingsPage implements OnInit {
+export class SettingsPage {
   settings: AppSettings;
   devicePlatform = Capacitor.getPlatform();
-  appVersion: string | null = null;
-  appBuild: string | null = null;
 
-  constructor(private readonly settingsService: SettingsService) {
+  constructor(
+    private readonly settingsService: SettingsService,
+    readonly env: EnvironmentService,
+  ) {
     this.settings = settingsService.get();
-  }
-
-  ngOnInit(): void {
-    this.loadDeviceInfo();
   }
 
   ionViewWillEnter(): void {
@@ -50,16 +47,5 @@ export class SettingsPage implements OnInit {
   save<K extends keyof AppSettings>(key: K, value: AppSettings[K]): void {
     this.settingsService.save({ [key]: value });
     this.settings = this.settingsService.get();
-  }
-
-  private async loadDeviceInfo(): Promise<void> {
-    if (this.devicePlatform === 'web') return;
-    try {
-      const info = await App.getInfo();
-      this.appVersion = info.version;
-      this.appBuild = info.build;
-    } catch {
-      // silently skip on web or emulator without native context
-    }
   }
 }
