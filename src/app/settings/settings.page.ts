@@ -11,6 +11,7 @@ import {
 } from '@ionic/angular/standalone';
 import { AppSettings, SettingsService } from '../services/settings.service';
 import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 
 @Component({
   standalone: true,
