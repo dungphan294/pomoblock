@@ -61,7 +61,6 @@ public class MainActivity extends BridgeActivity {
             int updateType = priority >= 4 ? AppUpdateType.IMMEDIATE : AppUpdateType.FLEXIBLE;
 
             if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && priority >= 1
                     && info.isUpdateTypeAllowed(updateType)) {
                 appUpdateManager.startUpdateFlowForResult(
                     info, updateResultLauncher,

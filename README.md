@@ -7,7 +7,7 @@ Ionic/Capacitor app with automated CI/CD via GitHub Actions + Fastlane for both 
 ## CI/CD Overview
 
 | Platform | Runner | Trigger | Destination |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | iOS | `macos-latest` | `[deploy]` or `[deploy:ios]` in commit message, or manual | TestFlight |
 | Android | `ubuntu-latest` | `[deploy]` or `[deploy:android]` in commit message, or manual | Play Store internal |
 
@@ -20,7 +20,7 @@ Both pipelines use [Fastlane](https://fastlane.tools/) for building and uploadin
 Deployments are opt-in. Add a keyword anywhere in your commit message to trigger the relevant pipeline(s):
 
 | Keyword | iOS | Android |
-|---|---|---|
+| --- | --- | --- |
 | `[deploy]` | ✅ | ✅ |
 | `[deploy:ios]` | ✅ | ❌ |
 | `[deploy:android]` | ❌ | ✅ |
@@ -46,7 +46,7 @@ Go to **GitHub → Settings → Secrets and variables → Actions** to add these
 ### iOS
 
 | Secret | Description | How to get it |
-|---|---|---|
+| --- | --- | --- |
 | `GOOGLE_SERVICE_INFO_PLIST_BASE64` | Firebase config for iOS, base64-encoded | **Firebase Console → Project settings → iOS app** → download `GoogleService-Info.plist` → `base64 -i GoogleService-Info.plist \| pbcopy` |
 | `IOS_CERTIFICATE_BASE64` | Apple Distribution .p12 certificate, base64-encoded | Export from **Keychain Access** → select your Apple Distribution cert → Export as .p12 → `base64 -i cert.p12 \| pbcopy` |
 | `IOS_CERTIFICATE_PASSWORD` | Password set when exporting the .p12 | You choose this when exporting |
@@ -59,7 +59,7 @@ Go to **GitHub → Settings → Secrets and variables → Actions** to add these
 ### Android
 
 | Secret | Description | How to get it |
-|---|---|---|
+| --- | --- | --- |
 | `GOOGLE_SERVICES_JSON_BASE64` | Firebase config for Android, base64-encoded | **Firebase Console → Project settings → Android app** → download `google-services.json` → `base64 -i google-services.json \| pbcopy` |
 | `ANDROID_KEYSTORE_BASE64` | Release keystore, base64-encoded | Generate with `keytool` (see below) → `base64 -i release.keystore \| pbcopy` |
 | `ANDROID_KEYSTORE_PASSWORD` | Keystore password | Set when running `keytool -genkey` |
@@ -76,12 +76,15 @@ Each Xcode target bundled inside the IPA (widgets, share extensions, notificatio
 1. **Register the App ID** — Apple Developer portal → Identifiers → `+` → App IDs → type: App Extension → bundle ID: `com.pomoblock.app.<extension-name>`
 2. **Create a Distribution profile** — Profiles → `+` → App Store Connect → select the new App ID → download the `.mobileprovision`
 3. **Add a GitHub secret** — encode and add:
+
    ```bash
    base64 -i <extension>.mobileprovision | pbcopy
    # Secret name: IOS_<EXTENSION_NAME>_PROFILE_BASE64
    ```
+
 4. **Add an import step** in `.github/workflows/ios-deploy.yml` (copy the "Import Push Extension Provisioning Profile" step, change the secret name and env var name)
 5. **Add an entry** to `provisioningProfiles` in `ios/fastlane/Fastfile`:
+
    ```ruby
    "com.pomoblock.app.<extension-name>" => ENV["<EXTENSION_NAME>_PROFILE_UUID"]
    ```
@@ -95,6 +98,7 @@ The app uses the [Google Play in-app updates API](https://developer.android.com/
 **How it works end-to-end:**
 
 1. **Fastlane sets the priority** when uploading to Play Store. In `android/fastlane/Fastfile`:
+
    ```ruby
    upload_to_play_store(
      track: "internal",
@@ -102,24 +106,38 @@ The app uses the [Google Play in-app updates API](https://developer.android.com/
      in_app_update_priority: 5
    )
    ```
-2. **`MainActivity` reads it** on launch via `AppUpdateManager`. If an update is available and priority ≥ 4, it shows a full-screen `IMMEDIATE` update flow the user must complete before continuing.
+
+2. **`MainActivity` reads it** on launch via `AppUpdateManager` and routes to the appropriate update flow.
 
 **Priority scale (0–5):**
 
 | Value | Behaviour |
 | --- | --- |
-| 0 | Default — no in-app prompt |
-| 1–3 | Available but app ignores it (current threshold is `>= 4`) |
-| 4–5 | Triggers `IMMEDIATE` forced update flow |
+| 0–3 | `FLEXIBLE` — downloads in background, restart dialog when ready |
+| 4–5 | `IMMEDIATE` — full-screen forced update, user must complete before continuing |
 
 **To ship a non-critical release** (e.g. a minor feature, no urgent fix), lower the priority before deploying:
 
 ```ruby
 # android/fastlane/Fastfile
-in_app_update_priority: 2   # user won't be prompted to update in-app
+in_app_update_priority: 2   # triggers flexible background update
 ```
 
 Restore to `5` for the next critical release.
+
+---
+
+## Testing in-app updates (Android)
+
+All three conditions must be true before the update prompt appears:
+
+1. **Install from the Play Store internal testing track** — not via ADB or Android Studio. The device's Google account must have accepted the internal testing invite in Play Console, then installed through the Play Store app.
+2. **The installed version must be older than the version on the track** — the prompt only appears when Play Store `versionCode` > installed `versionCode`. If the device already has the latest build, there is nothing to update to.
+3. **`in_app_update_priority` is metadata only** — it controls `IMMEDIATE` vs `FLEXIBLE` in the app code. It does not make an update appear.
+
+**Local testing without a Play Store release:**
+
+Replace `AppUpdateManagerFactory.create(this)` in `MainActivity.java` with `new FakeAppUpdateManager(this)` temporarily. `FakeAppUpdateManager` simulates update availability on any device without needing a real Play Store release. Remember to revert before shipping.
 
 ---
 
@@ -148,7 +166,7 @@ base64 -i yourfile | pbcopy   # encodes and copies to clipboard
 
 ## Project structure
 
-```
+```text
 .github/workflows/
   ios-deploy.yml       # iOS pipeline
   android-deploy.yml   # Android pipeline
