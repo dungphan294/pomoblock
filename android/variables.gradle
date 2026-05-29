@@ -15,4 +15,5 @@ ext {
     cordovaAndroidVersion = '14.0.1'
     firebaseBomVersion = '34.13.0'
     appUpdateVersion = '2.1.0'
+    appUpdateKtxVersion = '2.1.0'
 }
