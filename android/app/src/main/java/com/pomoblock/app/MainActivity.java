@@ -65,8 +65,9 @@ public class MainActivity extends BridgeActivity {
                 appUpdateManager.startUpdateFlowForResult(
                     info, updateResultLauncher,
                     AppUpdateOptions.newBuilder(updateType).build());
-            } else if (info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                // Resume a stalled immediate update
+            } else if (info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+                    && priority >= 4) {
+                // Resume a stalled immediate update only if still high priority
                 appUpdateManager.startUpdateFlowForResult(
                     info, updateResultLauncher,
                     AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build());
