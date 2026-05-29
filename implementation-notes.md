@@ -36,6 +36,26 @@ def servicesJSON = file('google-services.json')
 
 Same strategy as iOS workflow.
 
+### Added: AppUpdateManager in MainActivity
+
+`in_app_update_priority: 5` in Fastlane stamps a server-side value on the Play Store release. Without client-side code, nothing reads it and users never see an update prompt. `MainActivity.java` now implements `AppUpdateManager` to close that loop.
+
+On `onCreate`, `checkForUpdate()` calls `getAppUpdateInfo()`. If an update is available and `updatePriority() >= 4`, it launches `AppUpdateType.IMMEDIATE` — a full-screen flow the user cannot dismiss until the update installs. On `onResume`, the same check runs for `DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS` to resume any interrupted flow (e.g., user backgrounded the app mid-update).
+
+Threshold `>= 4` is intentional: Fastlane sets priority 5 for all deploys currently. Future non-critical releases can be set to ≤ 3 in the Fastfile and will be silently skipped by this check.
+
+`onActivityResult` (not `registerForActivityResult`) is used to stay consistent with how Capacitor's `BridgeActivity` handles results internally. `super.onActivityResult()` is called first so the bridge can process its own results before we inspect the request code.
+
+Dependency added to `android/app/build.gradle`: `com.google.android.play:app-update:2.1.0`.
+
+### Added: `in_app_update_priority: 5` in Fastfile
+
+Google Play in-app update priority (0–5) is a server-side value set **at publish time**, not in app source code. The app reads it via `appUpdateInfo.updatePriority()` and uses it to decide between `AppUpdateType.FLEXIBLE` and `AppUpdateType.IMMEDIATE`. Because the value must be injected when the release is uploaded — not compiled into the APK — the correct place is `upload_to_play_store` in `android/fastlane/Fastfile`.
+
+`in_app_update_priority: 5` is now passed to every internal track upload. Priority 5 is the maximum; app code that checks `updatePriority() >= 4` will trigger an immediate forced update. To ship a non-critical release, lower this to 3 or below before running the deploy commit.
+
+Play Console UI does not expose this field — it must be set via the Publishing API (which Fastlane calls internally using the service account JSON).
+
 ### Left unchanged: `KEYSTORE_PATH = "release.keystore"`
 
 This is a relative filename used by `build.gradle` via `System.getenv("KEYSTORE_PATH")`. Gradle resolves `file("release.keystore")` relative to the app module (`android/app/`), which matches the decode target `android/app/release.keystore`. No change needed.
@@ -225,3 +245,52 @@ GitHub Actions cannot suppress a workflow run based on commit message content at
 Keywords: `[deploy]` = both platforms, `[deploy:ios]` = iOS only, `[deploy:android]` = Android only.
 
 **Tradeoff considered**: merging both workflows into a single `deploy.yml` with two jobs would reduce two workflow runs to one. Rejected as a risky structural change with no functional benefit — keeping the files separate maintains clearer ownership and per-platform failure isolation.
+
+---
+
+## spec.html — bug fix spec form
+
+### Standalone HTML, not an Angular component
+
+The template uses a completely different design system (`--color-text-primary`, Tabler Icons) with no overlap with the app's `--pomo-*` tokens and Ionic components. Wiring it into the Angular app would mean adding a route, installing Tabler Icons as a package, and creating a design-system impedance mismatch — none of which the spec called for. As a developer bug-filing tool it works better as a double-click HTML file anyway.
+
+### CSS variable definitions
+
+The template referenced ~10 `--color-*` custom properties not defined in the repo (`--color-text-primary`, `--color-background-secondary`, `--color-background-danger`, `--color-text-danger`, `--color-border-tertiary`, `--color-border-secondary`, `--font-sans`, `--font-mono`, `--border-radius-lg`). Defined all at `:root` borrowing from the PomoBlock Apple-semantic palette where they matched. Added a full dark-mode `:root` block because the template already had dark-mode chip overrides — omitting dark vars would have produced invisible text. Added `--color-surface` as an extra token because `.section` needs its own background in dark mode (otherwise cards bleed into the page background).
+
+Tabler Icons CDN pinned to `@3.29.0` (not `@latest`) to prevent a future breaking release from silently changing icon names.
+
+### Two chip interaction patterns
+
+| Chip type | Sections | Behaviour |
+| --- | --- | --- |
+| **Toggle chips** | §1 platforms, §5 Firebase features | Click to deactivate (dim to 28% opacity). All active by default. |
+| **Editable chips** | §2 stack versions | `contenteditable`. User replaces label text with actual version. Auto-select-all on focus so one keystroke replaces the label. Enter key blocked (replaced with blur) to prevent newlines inside a pill. |
+
+Toggle chips are all-on by default because "which platforms are affected" is a deselection task — you start with everything and remove what doesn't apply.
+
+### `contenteditable` vs `<input>`/`<textarea>`
+
+The template's design has no input borders on fields. Replacing spans with `<input>` elements would require fighting the browser's default input styles. `contenteditable` preserves the visual design exactly. Tradeoff: no native `required` validation, no `maxlength` — acceptable for a dev tool that doesn't submit.
+
+Placeholder via CSS `:empty::before { content: attr(data-placeholder) }` — shows placeholder only when the element has zero children. No JS focus/blur management needed.
+
+### Pre-filled "Request shape .NET expects" field
+
+Kept the template's hardcoded `<code>` example as a pre-filled editable field. Reset restores it specifically via `id="fieldRequestShape"` rather than blanking it like empty fields.
+
+### Copy as Markdown, not HTML/JSON
+
+Primary use is pasting into GitHub issues, Linear tickets, Notion, or an LLM prompt. Markdown is universally renderable. Added a `document.execCommand('copy')` fallback for `file://` usage (opening directly from the filesystem — `navigator.clipboard` requires HTTPS or localhost).
+
+### Reset
+
+Prompts before clearing. Restores editable chip labels from `data-default` attributes (original label text). Copied button turns green for 1.8s — no toast, no z-index management.
+
+### `.copy-btn` was in the template CSS but had no HTML
+
+The template had `.copy-btn { ... }` styled but no `<div class="copy-btn">` in the markup. Added "Copy as Markdown" (primary) + "Reset" (ghost) buttons.
+
+### What was not added (not in spec)
+
+localStorage persistence, multiple specs/tabs, validation UI, HTML/PDF export, add/remove chip controls.

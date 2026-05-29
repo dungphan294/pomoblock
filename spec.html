@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bug Fix Spec</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/tabler-icons.min.css">
+  <style>
+    /* ─── Design tokens ─────────────────────────────────────────────────────── */
+    :root {
+      --color-text-primary:         #1C1C1E;
+      --color-text-secondary:       #6C6C70;
+      --color-text-tertiary:        #AEAEB2;
+      --color-bg:                   #F2F2F7;
+      --color-surface:              #FFFFFF;
+      --color-background-secondary: #F2F2F7;
+      --color-background-danger:    rgba(229, 57, 53, 0.08);
+      --color-text-danger:          #C0392B;
+      --color-border-tertiary:      rgba(0, 0, 0, 0.08);
+      --color-border-secondary:     rgba(0, 0, 0, 0.14);
+      --font-sans:  -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      --font-mono:  'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+      --border-radius-lg: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-text-primary:         #F2F2F7;
+        --color-text-secondary:       #8E8E93;
+        --color-text-tertiary:        #48484A;
+        --color-bg:                   #000000;
+        --color-surface:              #1C1C1E;
+        --color-background-secondary: #2C2C2E;
+        --color-background-danger:    rgba(229, 57, 53, 0.18);
+        --color-text-danger:          #FF6B6B;
+        --color-border-tertiary:      rgba(255, 255, 255, 0.08);
+        --color-border-secondary:     rgba(255, 255, 255, 0.14);
+      }
+    }
+
+    /* ─── Base ──────────────────────────────────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Spec layout (from template) ──────────────────────────────────────── */
+    .spec { padding: 1.5rem 0; max-width: 680px; margin: 0 auto; }
+    .spec-header { margin-bottom: 2rem; }
+    .spec-header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+    .spec-header p  { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+
+    .section {
+      margin-bottom: 1.5rem;
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+    .section-header {
+      padding: 10px 16px;
+      background: var(--color-background-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+    }
+    .section-header i    { font-size: 15px; color: var(--color-text-secondary); }
+    .section-header span { font-size: 13px; font-weight: 500; color: var(--color-text-primary); letter-spacing: 0.01em; }
+
+    .badge          { font-size: 10px; padding: 2px 8px; border-radius: 99px; margin-left: auto; font-weight: 500; }
+    .badge-required { background: var(--color-background-danger); color: var(--color-text-danger); }
+    .badge-optional { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-secondary); }
+
+    .field {
+      padding: 10px 16px;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .field:last-child { border-bottom: none; }
+
+    .field-label {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      min-width: 160px;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+    .field-value {
+      font-size: 13px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      flex: 1;
+      min-height: 20px;
+    }
+    .field-value code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--color-background-secondary);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 0.5px solid var(--color-border-tertiary);
+    }
+
+    .stack-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; align-items: center; }
+
+    .chip {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .chip-blue   { background: #E6F1FB; color: #0C447C; }
+    .chip-purple { background: #EEEDFE; color: #3C3489; }
+    .chip-teal   { background: #E1F5EE; color: #085041; }
+    .chip-amber  { background: #FAEEDA; color: #633806; }
+    .chip-coral  { background: #FAECE7; color: #712B13; }
+
+    @media (prefers-color-scheme: dark) {
+      .chip-blue   { background: #0C447C; color: #B5D4F4; }
+      .chip-purple { background: #3C3489; color: #CECBF6; }
+      .chip-teal   { background: #085041; color: #9FE1CB; }
+      .chip-amber  { background: #633806; color: #FAC775; }
+      .chip-coral  { background: #712B13; color: #F5C4B3; }
+    }
+
+    /* Toggle chips — click to activate/deactivate */
+    .chip[data-toggle] {
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.12s;
+    }
+    .chip[data-toggle][data-inactive] { opacity: 0.28; }
+    .chip[data-toggle]:hover { opacity: 0.75; }
+
+    /* Editable chips — user replaces label text with actual version */
+    .chip[contenteditable] {
+      cursor: text;
+      outline: none;
+      transition: box-shadow 0.12s;
+    }
+    .chip[contenteditable]:focus {
+      box-shadow: 0 0 0 2px rgba(10, 122, 255, 0.4);
+    }
+
+    /* Editable text fields */
+    .field-value[contenteditable] {
+      outline: none;
+      border-radius: 4px;
+      transition: background 0.1s;
+    }
+    .field-value[contenteditable]:focus {
+      background: rgba(10, 122, 255, 0.05);
+    }
+    /* Placeholder via CSS — shown when element is truly empty */
+    .field-value[contenteditable]:empty::before {
+      content: attr(data-placeholder);
+      color: var(--color-text-tertiary);
+      font-style: italic;
+      pointer-events: none;
+    }
+
+    .divider { height: 0.5px; background: var(--color-border-tertiary); margin: 4px 0; }
+
+    /* ─── Buttons ────────────────────────────────────────────────────────────── */
+    .copy-btn { margin-top: 1.5rem; display: flex; gap: 8px; }
+    .btn {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.12s;
+    }
+    .btn:hover { opacity: 0.8; }
+    .btn-primary { background: #0A7AFF; color: #fff; }
+    .btn-primary.copied { background: #26A05D; }
+    .btn-ghost {
+      background: var(--color-background-secondary);
+      color: var(--color-text-secondary);
+      border: 0.5px solid var(--color-border-secondary);
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────────────────────── */
+    @media (max-width: 520px) {
+      .field { flex-direction: column; gap: 4px; }
+      .field-label { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+<div class="spec">
+  <div class="spec-header">
+    <h1>Bug fix spec — .NET + Firebase + Ionic/Capacitor plugin</h1>
+    <p>Fill in each section. Required fields drive the fix; optional fields prevent misunderstandings.</p>
+  </div>
+
+  <!-- 1. Bug identity -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-bug" aria-hidden="true"></i>
+      <span>1 · Bug identity</span>
+      <span class="badge badge-required">required</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Title (one line)</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder='e.g. "FCM token from plugin never reaches .NET API"'></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Observed behaviour</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="What actually happens — exact error message, HTTP status, or wrong UI state"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Expected behaviour</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="What should happen instead"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Reproduction steps</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder='1. Open app on Android 13 device. 2. Tap "Enable notifications". 3. Token never arrives in .NET logs.'></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Affected platform(s)</span>
+      <span class="field-value">
+        <div class="stack-row">
+          <span class="chip chip-teal" data-toggle>Android</span>
+          <span class="chip chip-blue" data-toggle>iOS</span>
+          <span class="chip chip-purple" data-toggle>Web (Ionic PWA)</span>
+        </div>
+      </span>
+    </div>
+  </div>
+
+  <!-- 2. Stack context -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-stack-2" aria-hidden="true"></i>
+      <span>2 · Stack context</span>
+      <span class="badge badge-required">required</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Backend</span>
+      <span class="field-value">
+        <div class="stack-row">
+          <span class="chip chip-blue" contenteditable="true" data-default=".NET version">.NET version</span>
+          <span class="chip chip-blue" contenteditable="true" data-default="Firebase Admin SDK version">Firebase Admin SDK version</span>
+          <span class="chip chip-blue" contenteditable="true" data-default="Auth method (service account / OIDC)">Auth method (service account / OIDC)</span>
+        </div>
+      </span>
+    </div>
+    <div class="field">
+      <span class="field-label">Frontend</span>
+      <span class="field-value">
+        <div class="stack-row">
+          <span class="chip chip-purple" contenteditable="true" data-default="Ionic version">Ionic version</span>
+          <span class="chip chip-purple" contenteditable="true" data-default="Capacitor version">Capacitor version</span>
+          <span class="chip chip-purple" contenteditable="true" data-default="Angular version">Angular version</span>
+          <span class="chip chip-purple" contenteditable="true" data-default="TypeScript version">TypeScript version</span>
+        </div>
+      </span>
+    </div>
+    <div class="field">
+      <span class="field-label">Capacitor plugin</span>
+      <span class="field-value">
+        <div class="stack-row">
+          <span class="chip chip-teal" contenteditable="true" data-default="Plugin name / npm package">Plugin name / npm package</span>
+          <span class="chip chip-teal" contenteditable="true" data-default="Version">Version</span>
+          <span class="chip chip-teal" contenteditable="true" data-default="Custom or third-party?">Custom or third-party?</span>
+        </div>
+      </span>
+    </div>
+    <div class="field">
+      <span class="field-label">Native bridge</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Android: Java / Kotlin? iOS: Objective-C / Swift? Which Capacitor plugin API version?"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Device / emulator</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="e.g. Pixel 7 Android 14, iPhone 15 iOS 17.4, Xcode 15.3 simulator"></span>
+    </div>
+  </div>
+
+  <!-- 3. Data contract -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-arrows-exchange" aria-hidden="true"></i>
+      <span>3 · Data contract (where the mismatch likely lives)</span>
+      <span class="badge badge-required">required</span>
+    </div>
+    <div class="field">
+      <span class="field-label">API endpoint(s)</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="e.g. POST /api/notifications/register-token"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Request shape .NET expects</span>
+      <span class="field-value" contenteditable="true" id="fieldRequestShape"><code>{ "deviceToken": "string", "platform": "android" | "ios" }</code></span>
+    </div>
+    <div class="field">
+      <span class="field-label">What the plugin/frontend sends</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Paste actual payload — even if wrong. This is usually where the bug is."></span>
+    </div>
+    <div class="field">
+      <span class="field-label">.NET response shape</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="What the API returns on success / on error (status + body)"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Plugin → Angular bridge call</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="How the plugin exposes data to Angular: Observable? Promise? EventEmitter? Plugin.addListener()?"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Auth / headers</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Bearer token? Firebase ID token? Custom header? Is the token being attached on the Angular HttpClient interceptor?"></span>
+    </div>
+  </div>
+
+  <!-- 4. Bridge layer -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-plug-connected" aria-hidden="true"></i>
+      <span>4 · Capacitor bridge layer</span>
+      <span class="badge badge-required">required</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Plugin method(s) involved</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="e.g. getToken(), onNotificationReceived(), requestPermission()"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Android implementation</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Which Java/Kotlin class? Which @PluginMethod? What does it return?"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">iOS implementation</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Which Swift/ObjC class? Which CAPPluginCall method? What does it return?"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Web fallback</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Is there a web implementation? Does it use Firebase JS SDK directly?"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Known bridge issue</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder='"resolve() called before token is ready", "JSObject key casing mismatch", "call.resolve() vs call.reject() misuse"'></span>
+    </div>
+  </div>
+
+  <!-- 5. Firebase specifics -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-flame" aria-hidden="true"></i>
+      <span>5 · Firebase specifics</span>
+      <span class="badge badge-optional">optional but useful</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Firebase feature(s) used</span>
+      <span class="field-value">
+        <div class="stack-row">
+          <span class="chip chip-amber" data-toggle>FCM push notifications</span>
+          <span class="chip chip-amber" data-toggle>Auth (ID tokens)</span>
+          <span class="chip chip-amber" data-toggle>Firestore</span>
+          <span class="chip chip-amber" data-toggle>Remote Config</span>
+        </div>
+      </span>
+    </div>
+    <div class="field">
+      <span class="field-label">.NET Admin SDK usage</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="e.g. FirebaseAdmin.Messaging.FirebaseMessaging.DefaultInstance.SendAsync(), FirebaseAdmin.Auth token verification"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">google-services.json / GoogleService-Info.plist</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Present and up to date? SHA-1 registered for Android?"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Service account</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Is GOOGLE_APPLICATION_CREDENTIALS set correctly in the .NET environment?"></span>
+    </div>
+  </div>
+
+  <!-- 6. Scope -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-ruler-2" aria-hidden="true"></i>
+      <span>6 · Fix scope &amp; constraints</span>
+      <span class="badge badge-optional">optional</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Fix only</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder='e.g. "Don&apos;t refactor the plugin API, just fix the data shape"'></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Do not touch</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder='e.g. "Leave the .NET controller signature unchanged"'></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Testing requirement</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Unit test? Manual on-device? CI pipeline?"></span>
+    </div>
+    <div class="field">
+      <span class="field-label">Already tried</span>
+      <span class="field-value" contenteditable="true"
+            data-placeholder="Saves time — list what didn't work"></span>
+    </div>
+  </div>
+
+  <div class="copy-btn">
+    <button type="button" class="btn btn-primary" id="btnCopy">Copy as Markdown</button>
+    <button type="button" class="btn btn-ghost"   id="btnReset">Reset</button>
+  </div>
+</div>
+
+<script>
+  // ── Toggle chips (platforms, Firebase features) ──────────────────────────────
+  document.querySelectorAll('.chip[data-toggle]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (chip.hasAttribute('data-inactive')) {
+        chip.removeAttribute('data-inactive');
+      } else {
+        chip.setAttribute('data-inactive', '');
+      }
+    });
+  });
+
+  // ── Editable chips — select-all on focus so typing replaces the label ────────
+  document.querySelectorAll('.chip[contenteditable]').forEach(chip => {
+    chip.addEventListener('focus', () => {
+      const range = document.createRange();
+      range.selectNodeContents(chip);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
+    // Prevent Enter from inserting a newline inside a chip
+    chip.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); chip.blur(); }
+    });
+  });
+
+  // ── Copy as Markdown ─────────────────────────────────────────────────────────
+  document.getElementById('btnCopy').addEventListener('click', async () => {
+    const btn = document.getElementById('btnCopy');
+    const md  = buildMarkdown();
+    try {
+      await navigator.clipboard.writeText(md);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = md;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy as Markdown';
+      btn.classList.remove('copied');
+    }, 1800);
+  });
+
+  // ── Reset ────────────────────────────────────────────────────────────────────
+  document.getElementById('btnReset').addEventListener('click', () => {
+    if (!confirm('Reset all fields to blank?')) return;
+
+    // Clear plain contenteditable text fields
+    document.querySelectorAll('.field-value[contenteditable]').forEach(el => {
+      if (el.id === 'fieldRequestShape') {
+        // Restore the pre-filled example
+        el.innerHTML = '<code>{ "deviceToken": "string", "platform": "android" | "ios" }</code>';
+      } else {
+        el.innerHTML = '';
+      }
+    });
+
+    // Restore editable chip labels to their defaults
+    document.querySelectorAll('.chip[contenteditable]').forEach(chip => {
+      chip.textContent = chip.getAttribute('data-default') || '';
+    });
+
+    // Re-activate all toggle chips
+    document.querySelectorAll('.chip[data-toggle]').forEach(c => {
+      c.removeAttribute('data-inactive');
+    });
+  });
+
+  // ── Markdown builder ─────────────────────────────────────────────────────────
+  function buildMarkdown() {
+    let md = '# Bug Fix Spec — .NET + Firebase + Ionic/Capacitor plugin\n\n';
+
+    document.querySelectorAll('.section').forEach(section => {
+      const titleEl = section.querySelector('.section-header span:not(.badge)');
+      if (titleEl) md += `## ${titleEl.textContent.trim()}\n\n`;
+
+      section.querySelectorAll('.field').forEach(field => {
+        const label = field.querySelector('.field-label')?.textContent?.trim();
+        if (!label) return;
+
+        const toggleChips  = field.querySelectorAll('.chip[data-toggle]');
+        const editableChips = field.querySelectorAll('.chip[contenteditable]');
+        const textValue    = field.querySelector('.field-value[contenteditable]');
+
+        if (toggleChips.length > 0) {
+          const active = [...toggleChips]
+            .filter(c => !c.hasAttribute('data-inactive'))
+            .map(c => c.textContent.trim())
+            .join(', ');
+          md += `**${label}:** ${active || '—'}\n\n`;
+        } else if (editableChips.length > 0) {
+          const vals = [...editableChips]
+            .map(c => c.textContent.trim())
+            .filter(Boolean)
+            .join(' · ');
+          md += `**${label}:** ${vals || '—'}\n\n`;
+        } else if (textValue) {
+          const val = textValue.textContent.trim();
+          md += `**${label}:** ${val || '—'}\n\n`;
+        }
+      });
+    });
+
+    return md.trim();
+  }
+</script>
+</body>
+</html>

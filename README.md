@@ -88,6 +88,41 @@ Each Xcode target bundled inside the IPA (widgets, share extensions, notificatio
 
 ---
 
+## Android in-app update priority
+
+The app uses the [Google Play in-app updates API](https://developer.android.com/guide/playcore/in-app-updates) to prompt users to update without leaving the app.
+
+**How it works end-to-end:**
+
+1. **Fastlane sets the priority** when uploading to Play Store. In `android/fastlane/Fastfile`:
+   ```ruby
+   upload_to_play_store(
+     track: "internal",
+     json_key: "fastlane/play_store_key.json",
+     in_app_update_priority: 5
+   )
+   ```
+2. **`MainActivity` reads it** on launch via `AppUpdateManager`. If an update is available and priority ≥ 4, it shows a full-screen `IMMEDIATE` update flow the user must complete before continuing.
+
+**Priority scale (0–5):**
+
+| Value | Behaviour |
+| --- | --- |
+| 0 | Default — no in-app prompt |
+| 1–3 | Available but app ignores it (current threshold is `>= 4`) |
+| 4–5 | Triggers `IMMEDIATE` forced update flow |
+
+**To ship a non-critical release** (e.g. a minor feature, no urgent fix), lower the priority before deploying:
+
+```ruby
+# android/fastlane/Fastfile
+in_app_update_priority: 2   # user won't be prompted to update in-app
+```
+
+Restore to `5` for the next critical release.
+
+---
+
 ## Generating an Android keystore
 
 ```bash
