@@ -1,65 +1,90 @@
 package com.pomoblock.app;
 
-import android.content.Intent;
-import android.content.IntentSender;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.getcapacitor.BridgeActivity;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.appupdate.AppUpdateOptions;
+import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
 
 public class MainActivity extends BridgeActivity {
 
-    private static final int UPDATE_REQUEST_CODE = 100;
     private AppUpdateManager appUpdateManager;
+    private ActivityResultLauncher<IntentSenderRequest> updateResultLauncher;
+    private InstallStateUpdatedListener installStateListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         appUpdateManager = AppUpdateManagerFactory.create(this);
+
+        updateResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartIntentSenderForResult(),
+            result -> { /* user declined or update failed — retries on next resume */ }
+        );
+
+        installStateListener = state -> {
+            if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                promptFlexibleInstall();
+            }
+        };
+        appUpdateManager.registerListener(installStateListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         checkForUpdate();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (appUpdateManager == null) return;
-        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(info -> {
-            if (info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                try {
-                    appUpdateManager.startUpdateFlowForResult(
-                        info, this,
-                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
-                        UPDATE_REQUEST_CODE
-                    );
-                } catch (IntentSender.SendIntentException ignored) {}
-            }
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // resultCode != RESULT_OK means user dismissed or update failed.
-        // App continues running; the check fires again on next onResume.
+    public void onDestroy() {
+        if (appUpdateManager != null && installStateListener != null) {
+            appUpdateManager.unregisterListener(installStateListener);
+        }
+        super.onDestroy();
     }
 
     private void checkForUpdate() {
+        if (appUpdateManager == null) return;
         appUpdateManager.getAppUpdateInfo().addOnSuccessListener(info -> {
+            int priority = info.updatePriority();
+            int updateType = priority >= 4 ? AppUpdateType.IMMEDIATE : AppUpdateType.FLEXIBLE;
+
             if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && info.updatePriority() >= 4
-                    && info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                try {
-                    appUpdateManager.startUpdateFlowForResult(
-                        info, this,
-                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
-                        UPDATE_REQUEST_CODE
-                    );
-                } catch (IntentSender.SendIntentException ignored) {}
+                    && priority >= 1
+                    && info.isUpdateTypeAllowed(updateType)) {
+                appUpdateManager.startUpdateFlowForResult(
+                    info, updateResultLauncher,
+                    AppUpdateOptions.newBuilder(updateType).build());
+            } else if (info.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                // Resume a stalled immediate update
+                appUpdateManager.startUpdateFlowForResult(
+                    info, updateResultLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build());
+            } else if (info.installStatus() == InstallStatus.DOWNLOADED) {
+                // Flexible update finished downloading while app was backgrounded
+                promptFlexibleInstall();
             }
         });
+    }
+
+    private void promptFlexibleInstall() {
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("Update Ready")
+            .setMessage("The update has been downloaded. Restart now to apply it?")
+            .setCancelable(false)
+            .setNegativeButton("Later", null)
+            .setPositiveButton("Restart", (d, w) -> appUpdateManager.completeUpdate())
+            .show();
     }
 }
