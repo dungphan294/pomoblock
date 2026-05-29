@@ -1,14 +1,40 @@
 <ion-content [fullscreen]="true">
   <div class="about-container">
-    <img src="assets/icon/app-icon.svg" alt="PomoBlock icon" class="about-icon" />
+    <img
+      src="assets/icon/app-icon.svg"
+      alt="PomoBlock icon"
+      class="about-icon"
+    />
     <h2>PomoBlock</h2>
     <p>Stay focused. Block distractions.</p>
-    <p>PomoBlock is a simple, open-source Pomodoro timer designed to help you stay focused and boost your productivity. It blocks distracting websites and apps during your focus sessions, allowing you to work without interruptions.</p>
-    <p>Whether you're a student, professional, or anyone looking to improve their focus,
-PomoBlock is here to help you achieve your goals and make the most of your time.</p>
-    <p>Built with Ionic and Angular, PomoBlock is available on multiple platforms.</p>
+    <p>
+      PomoBlock is a simple, open-source Pomodoro timer designed to help you
+      stay focused and boost your productivity. It blocks distracting websites
+      and apps during your focus sessions, allowing you to work without
+      interruptions.
+    </p>
+    <p>
+      Whether you're a student, professional, or anyone looking to improve their
+      focus, PomoBlock is here to help you achieve your goals and make the most
+      of your time.
+    </p>
+    <p>
+      Built with Ionic and Angular, PomoBlock is available on multiple
+      platforms.
+    </p>
+    <p>
+      Source code available on GitHub.
+      <a
+        href="https://github.com/dungphan294/pomoblock"
+        target="_blank"
+        rel="noopener noreferrer"
+        >View on GitHub</a
+      >
+    </p>
     @if (env.isMobile) {
-      <p class="app-version">v{{ env.appVersion }} (Build {{ env.buildVersion }})</p>
+    <p class="app-version">
+      v{{ env.appVersion }} (Build {{ env.buildVersion }})
+    </p>
     }
   </div>
 </ion-content>
