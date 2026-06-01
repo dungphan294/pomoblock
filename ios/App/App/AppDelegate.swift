@@ -22,11 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     } catch {
       print("[AVAudioSession] setup failed: \(error)")
     }
-    do {
-      FirebaseApp.configure()
-    } catch {
-      print("[Firebase] setup failed: \(error)")
-    }
+    FirebaseApp.configure()
     return true
   }
 
