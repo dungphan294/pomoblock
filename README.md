@@ -4,6 +4,53 @@ Ionic/Capacitor app with automated CI/CD via GitHub Actions + Fastlane for both 
 
 ---
 
+## iOS min-version enforcement
+
+On every launch the app calls `GET /api/config?version=<appVersion>` on the backend. Based on the response it either:
+
+- **`force`** — shows a non-dismissible "Update Required" alert that opens the App Store. The app is blocked until the user updates.
+- **`flexible`** — shows a dismissible "Update Available" prompt.
+- **`none`** — continues normally.
+
+The minimum required version is updated automatically in Firestore every time the iOS deploy workflow pushes a new build to TestFlight (via `POST /api/admin/set-min-version`).
+
+### Local setup
+
+Set the backend URL in `src/environments/environment.ts`:
+
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000',   // point at your local pomoblock-backend
+};
+```
+
+The production URL (`src/environments/environment.prod.ts`) defaults to `https://pomoblock-backend.vercel.app`. Change it if you deploy the backend elsewhere.
+
+### Manually overriding the min version
+
+To force all users on a version older than `1.2.0` to update immediately:
+
+```bash
+# Get a token (requires ENTRA_CLIENT_SECRET)
+TOKEN=$(curl -s -X POST \
+  "https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/token" \
+  -d "grant_type=client_credentials" \
+  -d "client_id=<CLIENT_ID>" \
+  -d "client_secret=<CLIENT_SECRET>" \
+  -d "scope=<CLIENT_ID>/.default" \
+  | jq -r .access_token)
+
+curl -X POST https://pomoblock-backend.vercel.app/api/admin/set-min-version \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"version":"1.2.0"}'
+```
+
+To lower the min version (e.g. after rolling back), call the same endpoint with the older version string.
+
+---
+
 ## CI/CD Overview
 
 | Platform | Runner | Trigger | Destination |
@@ -55,6 +102,12 @@ Go to **GitHub → Settings → Secrets and variables → Actions** to add these
 | `APP_STORE_CONNECT_API_KEY_BASE64` | App Store Connect API key (.p8 file), base64-encoded | **App Store Connect → Users and Access → Integrations → Generate API Key** → download .p8 → `base64 -i key.p8 \| pbcopy` |
 | `APP_STORE_CONNECT_KEY_ID` | ID of the API key | Shown next to the key name in App Store Connect Integrations |
 | `APP_STORE_CONNECT_ISSUER_ID` | Issuer ID | Shown at the top of the App Store Connect Integrations page |
+| `ENTRA_TENANT_ID` | Azure AD tenant ID used to obtain an access token for the admin API | Azure portal → Azure Active Directory → Overview → Tenant ID |
+| `ENTRA_CLIENT_ID` | Client ID of the Azure App Registration for the backend | Azure portal → App registrations → your app → Application (client) ID |
+| `ENTRA_CLIENT_SECRET` | Client secret for the App Registration | Azure portal → App registrations → your app → Certificates & secrets → New client secret |
+| `ADMIN_API_URL` | Base URL of the deployed pomoblock-backend, e.g. `https://pomoblock-backend.vercel.app` | Vercel dashboard → your project → Domains |
+
+The iOS pipeline uses these four secrets in a post-Fastlane step that calls `POST /api/admin/set-min-version` with the current `package.json` version. This records the minimum required iOS version in Firestore so that clients running an older build receive a force-update prompt.
 
 ### Android
 

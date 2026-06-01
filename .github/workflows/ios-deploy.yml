@@ -104,6 +104,35 @@ jobs:
         working-directory: ios
         run: bundle exec fastlane beta
 
+      - name: Update min iOS version in backend
+        env:
+          ENTRA_TENANT_ID: ${{ secrets.ENTRA_TENANT_ID }}
+          ENTRA_CLIENT_ID: ${{ secrets.ENTRA_CLIENT_ID }}
+          ENTRA_CLIENT_SECRET: ${{ secrets.ENTRA_CLIENT_SECRET }}
+          ADMIN_API_URL: ${{ secrets.ADMIN_API_URL }}
+        run: |
+          MINIMUM_VERSION=$(node -p "require('./package.json').minimum_version")
+
+          TOKEN=$(curl -s -X POST \
+            "https://login.microsoftonline.com/${ENTRA_TENANT_ID}/oauth2/v2.0/token" \
+            -d "grant_type=client_credentials" \
+            -d "client_id=${ENTRA_CLIENT_ID}" \
+            -d "client_secret=${ENTRA_CLIENT_SECRET}" \
+            -d "scope=${ENTRA_CLIENT_ID}/.default" \
+            | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).access_token")
+
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "${ADMIN_API_URL}/api/admin/set-min-version" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"version\":\"${MINIMUM_VERSION}\"}")
+
+          echo "Admin API responded: ${HTTP_STATUS}"
+          if [ "${HTTP_STATUS}" != "200" ]; then
+            echo "Failed to update min version (HTTP ${HTTP_STATUS})"
+            exit 1
+          fi
+
       - name: Upload Build Log on Failure
         if: failure()
         uses: actions/upload-artifact@v4
