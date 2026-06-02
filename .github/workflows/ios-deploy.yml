@@ -44,10 +44,11 @@ jobs:
             proj = Xcodeproj::Project.open('ios/App/App.xcodeproj')
             target = proj.targets.find { |t| t.name == 'App' }
             group  = proj.main_group.find_subpath('App', false)
-            next if group.files.any? { |f| f.path == 'GoogleService-Info.plist' }
-            file_ref = group.new_file('GoogleService-Info.plist')
-            target.add_file_references([file_ref])
-            proj.save
+            unless group.files.any? { |f| f.path == 'GoogleService-Info.plist' }
+              file_ref = group.new_file('GoogleService-Info.plist')
+              target.add_file_references([file_ref])
+              proj.save
+            end
           RUBY
 
       - name: Install Dependencies & Build Web Assets
