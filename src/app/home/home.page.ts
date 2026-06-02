@@ -43,10 +43,8 @@ export class HomePage implements OnInit, OnDestroy {
       if (result.receive === 'granted') {
         // Register with Apple / Google to receive push via APNS/FCM
         PushNotifications.register();
-      } else {
-        // Show some error
       }
-    });
+    }).catch(err => console.error('[PushNotifications] requestPermissions failed:', err));
 
     // On success, we should be able to receive notifications
     PushNotifications.addListener('registration',

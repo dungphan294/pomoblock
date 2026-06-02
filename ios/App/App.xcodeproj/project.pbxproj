@@ -16,6 +16,8 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		6D5FD5642FCDE07600AF0522 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FD5632FCDE07000AF0522 /* SceneDelegate.swift */; };
+		6D5FD56A2FCEA50D00AF0522 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FD5692FCEA50D00AF0522 /* AppConstants.swift */; };
+		6D5FD56B2FCEA50D00AF0522 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5FD5692FCEA50D00AF0522 /* AppConstants.swift */; };
 		6DF852002FC71FCB00C51F07 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6DF851FF2FC71FCB00C51F07 /* FirebaseCore */; };
 		6DF852022FC71FD200C51F07 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6DF852012FC71FD200C51F07 /* FirebaseMessaging */; };
 		6DF8520E2FC720C500C51F07 /* pushextension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6DF852072FC720C500C51F07 /* pushextension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -58,6 +60,7 @@
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		6D16807E2FBEFEA800B0810E /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		6D5FD5632FCDE07000AF0522 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		6D5FD5692FCEA50D00AF0522 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		6DF852072FC720C500C51F07 /* pushextension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = pushextension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -101,6 +104,7 @@
 		504EC2FB1FED79650016851F = {
 			isa = PBXGroup;
 			children = (
+				6D5FD5672FCEA4A200AF0522 /* Shared */,
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				6DF852082FC720C500C51F07 /* pushextension */,
@@ -133,6 +137,14 @@
 				50B271D01FEDC1A000F3C39B /* public */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		6D5FD5672FCEA4A200AF0522 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				6D5FD5692FCEA50D00AF0522 /* AppConstants.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		6DF851FE2FC71FCB00C51F07 /* Frameworks */ = {
@@ -263,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				6D5FD56B2FCEA50D00AF0522 /* AppConstants.swift in Sources */,
 				6D5FD5642FCDE07600AF0522 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -271,6 +284,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D5FD56A2FCEA50D00AF0522 /* AppConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,7 +434,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 42UDXF695V;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Pomo Block";
@@ -430,7 +444,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pomoblock.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -446,7 +460,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 42UDXF695V;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Pomo Block";
@@ -456,7 +470,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pomoblock.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";

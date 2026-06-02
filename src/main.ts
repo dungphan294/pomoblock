@@ -19,6 +19,7 @@ bootstrapApplication(AppComponent, {
       const env = inject(EnvironmentService);
       const versionCheck = inject(VersionCheckService);
       await env.init();
+      // env.appVersion = '1.0.1'; // TODO: remove — testing force/flexible update
       await versionCheck.check();
     }),
   ],

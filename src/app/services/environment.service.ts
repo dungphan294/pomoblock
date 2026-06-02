@@ -5,6 +5,7 @@ import { App } from '@capacitor/app';
 @Injectable({ providedIn: 'root' })
 export class EnvironmentService {
   isMobile = Capacitor.isNativePlatform();
+  isIos    = Capacitor.getPlatform() === 'ios';
   appVersion = 'unknown';
   buildVersion = 'unknown';
 
