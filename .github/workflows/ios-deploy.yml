@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build_and_deploy:
     if: |
@@ -34,6 +37,8 @@ jobs:
           ENCODED_GOOGLE_SERVICE: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}
         run: |
           echo "$ENCODED_GOOGLE_SERVICE" | base64 --decode > ios/App/App/GoogleService-Info.plist
+          file ios/App/App/GoogleService-Info.plist
+          plutil -lint ios/App/App/GoogleService-Info.plist
 
       - name: Install Dependencies & Build Web Assets
         run: |

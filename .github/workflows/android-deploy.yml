@@ -6,6 +6,9 @@ on:
       - main # Triggers automatically when you push to the main branch
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build_and_deploy:
     if: |
